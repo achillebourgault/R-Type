@@ -1,0 +1,151 @@
+
+                              R-Type RFC Protocol
+
+Status of this Memo
+
+   This memo provides information about R-Type Binary Protocol.
+
+
+Table of Contents
+
+   1.   Introduction . . . . . . . . . . . . . . . . . . . . . . . . 1
+   2.   Authentication . . . . . . . . . . . . . . . . . . . . . . . 2
+   3.   Players and monsters positions . . . . . . . . . . . . . . . 3
+   4.   Actions and Shoots . . . . . . . . . . . . . . . . . . . . . 4
+   5.   Death of an Entity . . . . . . . . . . . . . . . . . . . . . 5
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+				             Informational                      [Page 1]
+
+RFC 2223                  R-Type RFC Protocol              November 2021
+
+
+1.  Introduction
+
+    The R-type binary protocol works in UDP.
+    It aims to be as simple as possible.
+    It contains a Timestamp, a Packet type, Data length information
+    and optional data.
+
+
+
+
+
+
+
+
+
+
+
+
+
+   				             Informational                      [Page 2]
+
+RFC 2223                  R-Type RFC Protocol              November 2021
+
+
+2.  Authentication (connect phase)
+
+	When a player want to connect to server, its client sends a request.
+	If the server accepts, it answers a ConnectionAccepted packet containing
+	the index of the player in the room.
+	Then, the server sends the list of players that are currently in the lobby.
+	The client loads the Lobby scene.
+
+	Players can then click Ready, sending a PlayerIsReady packet with data
+	containing its index in the room.
+	This packet is forwarded to other players in the room so that they can
+	update the list.
+
+	When all players are ready, server sends a GameStart packet that trigger
+	loading of the GameScene.
+
+
+
+
+   				             Informational                      [Page 3]
+
+RFC 2223                  R-Type RFC Protocol              November 2021
+
+
+3.  Players and monsters positions
+
+	60 times per second, client send their local player's state to the server
+	through a PlayerStateUpdate packet.
+	The server compiles this data into its internal game state and then
+	broadcasts it to all players in the game through a GameStateUpdate packet.
+
+
+
+
+
+
+
+
+
+
+
+
+   				             Informational                      [Page 4]
+
+RFC 2223                  R-Type RFC Protocol              November 2021
+
+
+4.  Actions and shoots
+
+	When a player shoots, it sets its state.hasShot to true and sends it on the
+	next player state update packet.
+	The server then tells other players to shoot a fake projectile.
+
+
+
+
+
+
+
+
+
+
+
+
+
+   				             Informational                      [Page 5]
+
+RFC 2223                  R-Type RFC Protocol              November 2021
+
+
+5.  Death of an entity
+
+	Monster deaths are Client-calculated for more accuracy.
+	When a local player projectile collides with a monster,
+	it notifies the client through a MonsterDied packet containing its state.ID.
+	Other clients then replicate the monster death
+
+	Player deaths are calculated by the server.
+	When a player dies, the server notifies all clients through a PlayerDied
+	packet containing the dead player's ID.
+
+	When all players are dead, the server tells all clients to load the GameOver
+	scene.
+
+
+
+
+

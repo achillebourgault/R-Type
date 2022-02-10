@@ -1,0 +1,9 @@
+.idea
+r-type_client
+r-type_server
+cmake-build-debug
+*.so
+*.o
+build
+/.run/
+/recent_servers.data
